@@ -1,0 +1,21 @@
+name: 刷新 Skill 资源库
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      # 资源合入后通知站点仓库，由站点构建同一份资源快照的页面和 ZIP。
+      - name: 触发静态站构建
+        env:
+          GH_TOKEN: ${{ secrets.SKILL_SITE_DISPATCH_TOKEN }}
+          SITE_REPO: ${{ vars.SKILL_SITE_REPOSITORY }}
+        run: |
+          : "${GH_TOKEN:?请配置 SKILL_SITE_DISPATCH_TOKEN}"
+          : "${SITE_REPO:?请配置 SKILL_SITE_REPOSITORY}"
+          gh workflow run publish.yml --repo "$SITE_REPO" --ref main
